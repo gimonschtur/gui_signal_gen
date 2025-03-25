@@ -124,8 +124,12 @@ class CommandGUI(QMainWindow):
 
         # Add widgets to button layout
         button_layout.addWidget(self.send_button)
-        button_layout.addWidget(self.command_output_field)
-        button_layout.addWidget(self.response_field)
+
+        command_status_layout = QHBoxLayout()
+        command_status_layout.addWidget(self.command_output_field)
+        command_status_layout.addWidget(self.response_field)
+
+        button_layout.addLayout(command_status_layout)
 
         # Add button layout to group layout
         command_group_layout.addLayout(button_layout)
@@ -202,9 +206,9 @@ class CommandGUI(QMainWindow):
 
         # Send the command
         if self.serial_comm.send_command(formatted_command):
-            self.response_field.setText(self.serial_comm.last_response)
+            self.response_field.setText("SUCCESS")
         else:
-            self.response_field.setText("Failed to send command")
+            self.response_field.setText("FAILED")
 
     def format_command(self, command, id_value, value=None):
         """Format the command string based on the inputs"""
