@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                             QHBoxLayout, QComboBox, QLineEdit, QPushButton, QLabel,
                             QGroupBox, QGridLayout, QFormLayout)
 from config.commands_config import COMMANDS_CONFIG, DEVICE_LIST, COMMANDS
+from imports.serial_commander.serial_communication import SerialCommunication
 
 # Filter out specifically the sipPyTypeDict deprecation warning
 warnings.filterwarnings('ignore', message='.*sipPyTypeDict.*')
@@ -13,21 +14,20 @@ class CommandGUI(QMainWindow):
         super().__init__()
         self.setWindowTitle("Custom Commands")
         self.current_board = DEVICE_LIST[1]  # Default board
+        self.serial_comm = SerialCommunication()
+
+        # List available COM ports
+        self.available_ports = self.serial_comm.list_available_ports()
+        print("Available COM Ports:", self.available_ports)  # Or update a UI element with this info
+
         self.initUI()
 
-    def initUI(self):
-        # Create central widget and main layout
-        central_widget = QWidget()
-        self.setCentralWidget(central_widget)
-        main_layout = QVBoxLayout(central_widget)
-
-        # Create group box for commands
+    def create_command_group_box(self) -> QGroupBox:
         group_box = QGroupBox("Custom Commands")
-        main_layout.addWidget(group_box)
 
         # Create layout for group box
-        group_layout = QVBoxLayout()
-        group_box.setLayout(group_layout)
+        command_group_layout = QVBoxLayout()
+        group_box.setLayout(command_group_layout)
 
         # Create grid layout for command inputs
         command_grid_layout = QGridLayout()
@@ -40,7 +40,7 @@ class CommandGUI(QMainWindow):
         self.device_combo.currentTextChanged.connect(self.update_current_device)
         device_layout.addRow("Device:", self.device_combo)
 
-        group_layout.addLayout(device_layout)
+        command_group_layout.addLayout(device_layout)
 
         # Command ComboBox
         self.command_combo = QComboBox()
@@ -64,7 +64,7 @@ class CommandGUI(QMainWindow):
         command_grid_layout.addWidget(self.value_input,   1, 2)
 
         # Add command grid layout to group layout
-        group_layout.addLayout(command_grid_layout)
+        command_group_layout.addLayout(command_grid_layout)
 
         # Create button and response layout
         button_layout = QVBoxLayout()
@@ -89,7 +89,19 @@ class CommandGUI(QMainWindow):
         button_layout.addWidget(self.response_field)
 
         # Add button layout to group layout
-        group_layout.addLayout(button_layout)
+        command_group_layout.addLayout(button_layout)
+
+        return group_box
+
+    def initUI(self):
+        # Create central widget and main layout
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+
+        # Create group box for commands
+        group_box = self.create_command_group_box()
+        main_layout.addWidget(group_box)
 
         # Initialize the ID combo box
         self.update_id_combo()
