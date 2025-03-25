@@ -1,0 +1,3 @@
+[submodule "import/serial_commander"]
+	path = import/serial_commander
+	url = git@github.com:gimonschtur/serial_commander.git
