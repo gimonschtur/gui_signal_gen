@@ -28,60 +28,66 @@ class CLOSED_LOOP_PARAMS(Enum):
     CONFIG_OVERRIDE_DAC2_VAL = auto()
     CONFIG_NUM_FIELDS        = auto()
 
+DEVICE_LIST = [
+    "ESP32S2 Dev Module",
+    "DOIT ESP32 DEVKIT V1",
+    "WEMOS D1 MINI"
+]
+
 COMMANDS_CONFIG = {
     "GPIO_OUTPUT": {
         "id": {
-            "ESP32S2 Dev Module"  : [33, 34, 35, 36, 37, 38],
-            "DOIT ESP32 DEVKIT V1": [4, 14, 16, 17, 27],
-            "WEMOS D1 MINI"       : [13, 14, 15]
+            DEVICE_LIST[0] : [33, 34, 35, 36, 37, 38],
+            DEVICE_LIST[1] : [4, 14, 16, 17, 27],
+            DEVICE_LIST[2] : [13, 14, 15]
         },
         "validator": None
     },
     "GPIO_INPUT": {
         "id": {
-            "ESP32S2 Dev Module"  : [10, 11, 12, 13],
-            "DOIT ESP32 DEVKIT V1": [35, 36, 39],
-            "WEMOS D1 MINI"       : [16, 17]
+            DEVICE_LIST[0] : [10, 11, 12, 13],
+            DEVICE_LIST[1] : [35, 36, 39],
+            DEVICE_LIST[2] : [16, 17]
         },
         "validator": None
     },
     "PWM_OUTPUT": {
         "id": {
-            "ESP32S2 Dev Module"  : [14, 15, 16],
-            "DOIT ESP32 DEVKIT V1": [5, 18, 19],
-            "WEMOS D1 MINI"       : [0, 2, 4]
+            DEVICE_LIST[0] : [14, 15, 16],
+            DEVICE_LIST[1] : [5, 18, 19],
+            DEVICE_LIST[2] : [0, 2, 4]
         },
         "validator": None
     },
     "ADC_INPUT": {
         "id": {
-            "ESP32S2 Dev Module"  : [3, 4, 5, 6, 7],
-            "DOIT ESP32 DEVKIT V1": [34, 13, 15],
-            "WEMOS D1 MINI"       : [34, 35, 36, 39]
+            DEVICE_LIST[0] : [3, 4, 5, 6, 7],
+            DEVICE_LIST[1] : [34, 13, 15],
+            DEVICE_LIST[2] : [34, 35, 36, 39]
         },
         "validator": None
     },
     "DAC_OUTPUT": {
         "id": {
-            "ESP32S2 Dev Module"  : [18, 100, 101, 102, 103],
-            "DOIT ESP32 DEVKIT V1": [25, 100, 101, 102, 103],
-            "WEMOS D1 MINI"       : [100, 101, 102, 103]
+            DEVICE_LIST[0] : [18, 100, 101, 102, 103],
+            DEVICE_LIST[1] : [25, 100, 101, 102, 103],
+            DEVICE_LIST[2] : [100, 101, 102, 103]
         },
         "validator": None
     },
     "GEN_SIGNAL": {
         "id": {
-            "ESP32S2 Dev Module"  : [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS],
-            "DOIT ESP32 DEVKIT V1": [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS],
-            "WEMOS D1 MINI"       : [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS]
+            DEVICE_LIST[0] : [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS],
+            DEVICE_LIST[1] : [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS],
+            DEVICE_LIST[2] : [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS]
         },
         "validator": None
     },
     "CLOSED_LOOP": {
         "id": {
-            "ESP32S2 Dev Module"  : [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS],
-            "DOIT ESP32 DEVKIT V1": [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS],
-            "WEMOS D1 MINI"       : [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS]
+            DEVICE_LIST[0] : [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS],
+            DEVICE_LIST[1] : [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS],
+            DEVICE_LIST[2] : [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS]
         },
         "validator": None
     }
