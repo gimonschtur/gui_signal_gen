@@ -1,6 +1,19 @@
 # ESP32 Automation System Command Configuration
 
 from enum import Enum, auto
+from utils.validators import RangeIntValidator
+
+class COMMANDS(Enum):
+    """
+    Enum for commands.
+    """
+    GPIO_OUTPUT = auto()
+    GPIO_INPUT  = auto()
+    PWM_OUTPUT  = auto()
+    ADC_INPUT   = auto()
+    DAC_OUTPUT  = auto()
+    GEN_SIGNAL  = auto()
+    CLOSED_LOOP = auto()
 
 class SIGNAL_GEN_PARAMS(Enum):
     """
@@ -34,61 +47,72 @@ DEVICE_LIST = [
     "WEMOS D1 MINI"
 ]
 
+# Define the range for each command
+VALIDATOR_RANGES = {
+    COMMANDS.GPIO_OUTPUT.name: (0, 10000),
+    COMMANDS.GPIO_INPUT.name : (0, 10000),
+    COMMANDS.PWM_OUTPUT.name : (0, 10000),
+    COMMANDS.ADC_INPUT.name  : (0, 0),
+    COMMANDS.DAC_OUTPUT.name : (0, 10000),
+    COMMANDS.GEN_SIGNAL.name : (0, 10000),
+    COMMANDS.CLOSED_LOOP.name: (0, 10000)
+}
+
 COMMANDS_CONFIG = {
-    "GPIO_OUTPUT": {
+    COMMANDS.GPIO_OUTPUT.name: {
         "id": {
-            DEVICE_LIST[0] : [33, 34, 35, 36, 37, 38],
-            DEVICE_LIST[1] : [4, 14, 16, 17, 27],
-            DEVICE_LIST[2] : [13, 14, 15]
+            DEVICE_LIST[0]: [33, 34, 35, 36, 37, 38],
+            DEVICE_LIST[1]: [4, 14, 16, 17, 27],
+            DEVICE_LIST[2]: [13, 14, 15]
         },
-        "validator": None
+        "validator": RangeIntValidator(*VALIDATOR_RANGES[COMMANDS.GPIO_OUTPUT.name])
     },
-    "GPIO_INPUT": {
+    COMMANDS.GPIO_INPUT.name: {
         "id": {
-            DEVICE_LIST[0] : [10, 11, 12, 13],
-            DEVICE_LIST[1] : [35, 36, 39],
-            DEVICE_LIST[2] : [16, 17]
+            DEVICE_LIST[0]: [10, 11, 12, 13],
+            DEVICE_LIST[1]: [35, 36, 39],
+            DEVICE_LIST[2]: [16, 17]
         },
-        "validator": None
+        "validator": RangeIntValidator(*VALIDATOR_RANGES[COMMANDS.GPIO_INPUT.name])
     },
-    "PWM_OUTPUT": {
+    COMMANDS.PWM_OUTPUT.name: {
         "id": {
-            DEVICE_LIST[0] : [14, 15, 16],
-            DEVICE_LIST[1] : [5, 18, 19],
-            DEVICE_LIST[2] : [0, 2, 4]
+            DEVICE_LIST[0]: [14, 15, 16],
+            DEVICE_LIST[1]: [5, 18, 19],
+            DEVICE_LIST[2]: [0, 2, 4]
         },
-        "validator": None
+        "validator": RangeIntValidator(*VALIDATOR_RANGES[COMMANDS.PWM_OUTPUT.name])
     },
-    "ADC_INPUT": {
+    COMMANDS.ADC_INPUT.name: {
         "id": {
-            DEVICE_LIST[0] : [3, 4, 5, 6, 7],
-            DEVICE_LIST[1] : [34, 13, 15],
-            DEVICE_LIST[2] : [34, 35, 36, 39]
+            DEVICE_LIST[0]: [3, 4, 5, 6, 7],
+            DEVICE_LIST[1]: [34, 13, 15],
+            DEVICE_LIST[2]: [34, 35, 36, 39]
         },
-        "validator": None
+        "validator": RangeIntValidator(*VALIDATOR_RANGES[COMMANDS.ADC_INPUT.name])
     },
-    "DAC_OUTPUT": {
+    COMMANDS.DAC_OUTPUT.name: {
         "id": {
-            DEVICE_LIST[0] : [18, 100, 101, 102, 103],
-            DEVICE_LIST[1] : [25, 100, 101, 102, 103],
-            DEVICE_LIST[2] : [100, 101, 102, 103]
+            DEVICE_LIST[0]: [18, 100, 101, 102, 103],
+            DEVICE_LIST[1]: [25, 100, 101, 102, 103],
+            DEVICE_LIST[2]: [100, 101, 102, 103]
         },
-        "validator": None
+        "validator": RangeIntValidator(*VALIDATOR_RANGES[COMMANDS.DAC_OUTPUT.name])
     },
-    "GEN_SIGNAL": {
+    COMMANDS.GEN_SIGNAL.name: {
         "id": {
-            DEVICE_LIST[0] : [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS],
-            DEVICE_LIST[1] : [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS],
-            DEVICE_LIST[2] : [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS]
+            DEVICE_LIST[0]: [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS],
+            DEVICE_LIST[1]: [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS],
+            DEVICE_LIST[2]: [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS]
         },
-        "validator": None
+        "validator": RangeIntValidator(*VALIDATOR_RANGES[COMMANDS.GEN_SIGNAL.name])
     },
-    "CLOSED_LOOP": {
+    COMMANDS.CLOSED_LOOP.name: {
         "id": {
-            DEVICE_LIST[0] : [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS],
-            DEVICE_LIST[1] : [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS],
-            DEVICE_LIST[2] : [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS]
+            DEVICE_LIST[0]: [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS],
+            DEVICE_LIST[1]: [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS],
+            DEVICE_LIST[2]: [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS]
         },
-        "validator": None
+        "validator": RangeIntValidator(*VALIDATOR_RANGES[COMMANDS.CLOSED_LOOP.name])
     }
 }

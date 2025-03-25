@@ -2,8 +2,8 @@ import sys
 import warnings
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                             QHBoxLayout, QComboBox, QLineEdit, QPushButton, QLabel,
-                            QGroupBox, QGridLayout)
-from config.commands_config import COMMANDS_CONFIG, DEVICE_LIST
+                            QGroupBox, QGridLayout, QFormLayout)
+from config.commands_config import COMMANDS_CONFIG, DEVICE_LIST, COMMANDS
 
 # Filter out specifically the sipPyTypeDict deprecation warning
 warnings.filterwarnings('ignore', message='.*sipPyTypeDict.*')
@@ -32,15 +32,13 @@ class CommandGUI(QMainWindow):
         # Create grid layout for command inputs
         command_grid_layout = QGridLayout()
 
-        device_layout = QHBoxLayout()
-        device_label = QLabel("Device:")
+        device_layout = QFormLayout()
         self.device_combo = QComboBox()
         self.device_combo.setFixedWidth(200)
         self.device_combo.addItems(DEVICE_LIST)
         self.device_combo.setCurrentText(self.current_board)
         self.device_combo.currentTextChanged.connect(self.update_current_device)
-        device_layout.addWidget(device_label)
-        device_layout.addWidget(self.device_combo)
+        device_layout.addRow("Device:", self.device_combo)
 
         group_layout.addLayout(device_layout)
 
@@ -48,7 +46,7 @@ class CommandGUI(QMainWindow):
         self.command_combo = QComboBox()
         self.command_combo.setFixedWidth(200)
         self.command_combo.addItems(COMMANDS_CONFIG.keys())
-        self.command_combo.currentTextChanged.connect(self.update_id_combo)
+        self.command_combo.currentTextChanged.connect(self.update_command_combo)
 
         # ID ComboBox
         self.id_combo = QComboBox()
@@ -100,6 +98,16 @@ class CommandGUI(QMainWindow):
         self.current_board = self.device_combo.currentText()
         self.update_id_combo()
 
+    def update_command_combo(self):
+        if self.command_combo.currentText() == COMMANDS.ADC_INPUT.name:
+            self.value_input.setEnabled(False)
+            self.value_input.clear()
+        else:
+            self.value_input.setEnabled(True)
+
+        # Update the ID combo box
+        self.update_id_combo()
+
     def update_id_combo(self):
         """Update the ID combo box based on the selected command"""
         self.id_combo.clear()
@@ -107,6 +115,10 @@ class CommandGUI(QMainWindow):
         if selected_command in COMMANDS_CONFIG:
             ids = COMMANDS_CONFIG[selected_command]["id"][self.current_board]
             self.id_combo.addItems([str(id_) for id_ in ids])
+
+            # Set the validator for the value input
+            validator = COMMANDS_CONFIG[selected_command]["validator"]
+            self.value_input.setValidator(validator)
 
     def send_command(self):
         """Handle the send command button click"""
@@ -117,11 +129,25 @@ class CommandGUI(QMainWindow):
         self.command_output_field.clear()
         self.response_field.clear()
 
-        if all([command, id_value, value]):
-            # Here you would typically send the command to the ESP32
-            # For now, we'll just show the command in the response field
-            command = f"{command} {id_value} {value}"
-            self.command_output_field.setText(command)
+        # Handle ADC_INPUT command separately
+        if command == COMMANDS.ADC_INPUT.name:
+            formatted_command = self.format_command(command, id_value)
+            self.command_output_field.setText(formatted_command)
+            return
+
+        # Check if all required fields are filled
+        if not all([command, id_value, value]):
+            return  # Early return if any field is empty
+
+        # Format and display the command
+        formatted_command = self.format_command(command, id_value, value)
+        self.command_output_field.setText(formatted_command)
+
+    def format_command(self, command, id_value, value=None):
+        """Format the command string based on the inputs"""
+        if value is not None:
+            return f"{command} {id_value} {value}"
+        return f"{command} {id_value}"
 
 def main():
     app = QApplication(sys.argv)
