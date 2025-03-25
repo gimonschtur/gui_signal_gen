@@ -1,5 +1,6 @@
 import sys
 import warnings
+import logging
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                             QHBoxLayout, QComboBox, QLineEdit, QPushButton, QLabel,
                             QGroupBox, QGridLayout, QFormLayout)
@@ -9,18 +10,49 @@ from imports.serial_commander.serial_communication import SerialCommunication
 # Filter out specifically the sipPyTypeDict deprecation warning
 warnings.filterwarnings('ignore', message='.*sipPyTypeDict.*')
 
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s',
+    datefmt='%H:%M:%S'
+)
+
 class CommandGUI(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Custom Commands")
+        self.logger = logging.getLogger(__name__)
         self.current_board = DEVICE_LIST[1]  # Default board
         self.serial_comm = SerialCommunication()
 
         # List available COM ports
         self.available_ports = self.serial_comm.list_available_ports()
-        print("Available COM Ports:", self.available_ports)  # Or update a UI element with this info
+
+        self.logger.info("Command GUI initialized.")
 
         self.initUI()
+
+    def create_serial_comm_group_box(self) -> QGroupBox:
+        group_box = QGroupBox("Serial Communication")
+        layout = QVBoxLayout()
+        group_box.setLayout(layout)
+
+        serial_layout = QHBoxLayout()
+        layout.addLayout(serial_layout)
+
+        self.port_combo = QComboBox()
+        self.port_combo.addItems(self.available_ports)
+
+        port_list_form_layout = QFormLayout()
+        port_list_form_layout.addRow("Port:", self.port_combo)
+
+        port_connection_button = QPushButton("Connect")
+        port_connection_button.clicked.connect(self.connect_port)
+
+        serial_layout.addLayout(port_list_form_layout)
+        serial_layout.addWidget(port_connection_button)
+
+        return group_box
 
     def create_command_group_box(self) -> QGroupBox:
         group_box = QGroupBox("Custom Commands")
@@ -99,9 +131,8 @@ class CommandGUI(QMainWindow):
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
 
-        # Create group box for commands
-        group_box = self.create_command_group_box()
-        main_layout.addWidget(group_box)
+        main_layout.addWidget(self.create_serial_comm_group_box())
+        main_layout.addWidget(self.create_command_group_box())
 
         # Initialize the ID combo box
         self.update_id_combo()
@@ -160,6 +191,10 @@ class CommandGUI(QMainWindow):
         if value is not None:
             return f"{command} {id_value} {value}"
         return f"{command} {id_value}"
+
+    def connect_port(self):
+        port = self.port_combo.currentText()
+        self.serial_comm.open_serial(port)
 
 def main():
     app = QApplication(sys.argv)
