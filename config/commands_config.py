@@ -101,17 +101,17 @@ COMMANDS_CONFIG = {
     },
     COMMANDS.GEN_SIGNAL.name: {
         "id": {
-            DEVICE_LIST[0]: [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS],
-            DEVICE_LIST[1]: [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS],
-            DEVICE_LIST[2]: [param.name.replace("SIGNAL_GEN_", " ") for param in SIGNAL_GEN_PARAMS]
+            DEVICE_LIST[0]: [param.name.replace("SIGNAL_GEN_", "") for param in SIGNAL_GEN_PARAMS],
+            DEVICE_LIST[1]: [param.name.replace("SIGNAL_GEN_", "") for param in SIGNAL_GEN_PARAMS],
+            DEVICE_LIST[2]: [param.name.replace("SIGNAL_GEN_", "") for param in SIGNAL_GEN_PARAMS]
         },
         "validator": RangeIntValidator(*VALIDATOR_RANGES[COMMANDS.GEN_SIGNAL.name])
     },
     COMMANDS.CLOSED_LOOP.name: {
         "id": {
-            DEVICE_LIST[0]: [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS],
-            DEVICE_LIST[1]: [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS],
-            DEVICE_LIST[2]: [param.name.replace("CONFIG_", " ") for param in CLOSED_LOOP_PARAMS]
+            DEVICE_LIST[0]: [param.name.replace("CONFIG_", "") for param in CLOSED_LOOP_PARAMS],
+            DEVICE_LIST[1]: [param.name.replace("CONFIG_", "") for param in CLOSED_LOOP_PARAMS],
+            DEVICE_LIST[2]: [param.name.replace("CONFIG_", "") for param in CLOSED_LOOP_PARAMS]
         },
         "validator": RangeIntValidator(*VALIDATOR_RANGES[COMMANDS.CLOSED_LOOP.name])
     }

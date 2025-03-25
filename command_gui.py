@@ -1,10 +1,15 @@
 import sys
 import warnings
 import logging
-from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
-                            QHBoxLayout, QComboBox, QLineEdit, QPushButton, QLabel,
-                            QGroupBox, QGridLayout, QFormLayout)
-from config.commands_config import COMMANDS_CONFIG, DEVICE_LIST, COMMANDS
+from PyQt5.QtWidgets import (
+    QApplication, QMainWindow, QWidget, QVBoxLayout,
+    QHBoxLayout, QComboBox, QLineEdit, QPushButton, QLabel,
+    QGroupBox, QGridLayout, QFormLayout
+)
+from config.commands_config import (
+    COMMANDS_CONFIG, DEVICE_LIST, COMMANDS, CLOSED_LOOP_PARAMS, SIGNAL_GEN_PARAMS
+)
+from config.ui_config import MAIN_STYLE_SHEET
 from imports.serial_commander.serial_communication import SerialCommunication
 
 # Filter out specifically the sipPyTypeDict deprecation warning
@@ -46,11 +51,12 @@ class CommandGUI(QMainWindow):
         port_list_form_layout = QFormLayout()
         port_list_form_layout.addRow("Port:", self.port_combo)
 
-        port_connection_button = QPushButton("Connect")
-        port_connection_button.clicked.connect(self.connect_port)
+        self.port_connection_button = QPushButton("Connect")
+        self.port_connection_button.setCheckable(True)
+        self.port_connection_button.clicked.connect(self.connect_port)
 
         serial_layout.addLayout(port_list_form_layout)
-        serial_layout.addWidget(port_connection_button)
+        serial_layout.addWidget(self.port_connection_button)
 
         return group_box
 
@@ -102,8 +108,9 @@ class CommandGUI(QMainWindow):
         button_layout = QVBoxLayout()
 
         # Send Command button
-        send_button = QPushButton("Send Command")
-        send_button.clicked.connect(self.send_command)
+        self.send_button = QPushButton("Send Command")
+        self.send_button.setEnabled(False)
+        self.send_button.clicked.connect(self.send_command)
 
         # Command output field
         self.command_output_field = QLineEdit()
@@ -116,7 +123,7 @@ class CommandGUI(QMainWindow):
         self.response_field.setPlaceholderText("RESPONSE")
 
         # Add widgets to button layout
-        button_layout.addWidget(send_button)
+        button_layout.addWidget(self.send_button)
         button_layout.addWidget(self.command_output_field)
         button_layout.addWidget(self.response_field)
 
@@ -133,6 +140,8 @@ class CommandGUI(QMainWindow):
 
         main_layout.addWidget(self.create_serial_comm_group_box())
         main_layout.addWidget(self.create_command_group_box())
+
+        self.setStyleSheet(MAIN_STYLE_SHEET)
 
         # Initialize the ID combo box
         self.update_id_combo()
@@ -169,6 +178,11 @@ class CommandGUI(QMainWindow):
         id_value = self.id_combo.currentText()
         value = self.value_input.text()
 
+        if command == COMMANDS.CLOSED_LOOP.name:
+            id_value = CLOSED_LOOP_PARAMS[f'CONFIG_{id_value}'].value
+        elif command == COMMANDS.GEN_SIGNAL.name:
+            id_value = SIGNAL_GEN_PARAMS[f'SIGNAL_GEN_{id_value}'].value
+
         self.command_output_field.clear()
         self.response_field.clear()
 
@@ -186,6 +200,12 @@ class CommandGUI(QMainWindow):
         formatted_command = self.format_command(command, id_value, value)
         self.command_output_field.setText(formatted_command)
 
+        # Send the command
+        if self.serial_comm.send_command(formatted_command):
+            self.response_field.setText(self.serial_comm.last_response)
+        else:
+            self.response_field.setText("Failed to send command")
+
     def format_command(self, command, id_value, value=None):
         """Format the command string based on the inputs"""
         if value is not None:
@@ -193,8 +213,15 @@ class CommandGUI(QMainWindow):
         return f"{command} {id_value}"
 
     def connect_port(self):
-        port = self.port_combo.currentText()
-        self.serial_comm.open_serial(port)
+        if self.port_connection_button.isChecked():
+            port = self.port_combo.currentText()
+            self.serial_comm.open_serial(port)
+            self.port_connection_button.setText("Disconnect")
+            self.send_button.setEnabled(True)
+        else:
+            self.serial_comm.close_serial()
+            self.port_connection_button.setText("Connect")
+            self.send_button.setEnabled(False)
 
 def main():
     app = QApplication(sys.argv)
